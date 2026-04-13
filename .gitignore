@@ -1,0 +1,20 @@
+# Python
+__pycache__/
+*.pyc
+
+# Ambiente
+.venv/
+.env
+
+# Logs
+*.log
+
+#data
+data/*
+!data/raw/
+!data/processed/
+!data/**/.gitkeep
+
+# IDE
+.vscode/
+.idea/
