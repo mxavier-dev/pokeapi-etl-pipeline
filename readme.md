@@ -176,7 +176,7 @@ Avoids repeated lookups during relationship inserts.
 
 ```bash
 git clone https://github.com/mxavier-dev/pokeapi-etl-pipeline.git
-cd etl-pokeapi
+cd pokeapi-etl-pipeline
 ```
 
 ### 2. Create virtual environment
