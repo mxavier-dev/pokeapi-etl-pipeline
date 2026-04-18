@@ -175,7 +175,7 @@ Avoids repeated lookups during relationship inserts.
 ### 1. Clone repository
 
 ```bash
-git clone https://github.com/mxavier-dev/etl-pokeapi.git
+git clone https://github.com/mxavier-dev/pokeapi-etl-pipeline.git
 cd etl-pokeapi
 ```
 
