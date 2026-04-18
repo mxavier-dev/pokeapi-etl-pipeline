@@ -11,8 +11,8 @@ __pycache__/
 
 #data
 data/*
-!data/raw/
-!data/processed/
+data/raw/
+data/processed/
 !data/**/.gitkeep
 
 # IDE

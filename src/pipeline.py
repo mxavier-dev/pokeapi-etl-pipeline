@@ -14,9 +14,9 @@ def pipeline():
         data_type = extract_type()
 
         logger.info('Saving raw data')
-        # save_raw('pokemon', data_pokemon) 
-        # save_raw('ability', data_ability)
-        # save_raw('type', data_type)
+        save_raw('pokemon', data_pokemon) 
+        save_raw('ability', data_ability)
+        save_raw('type', data_type)
 
         logger.info('Transforming data')
         df_a = transform_ability(data_ability)
@@ -24,9 +24,9 @@ def pipeline():
         df_t = transform_type(data_type)
 
         logger.info('Saving transformed data')
-        # save_processed('ability', df_a)
-        # save_processed('type', df_t)
-        # save_processed('pokemon', df_p)
+        save_processed('ability', df_a)
+        save_processed('type', df_t)
+        save_processed('pokemon', df_p)
         
         logger.info('Loading data to the database')
         insert_all(df_p)

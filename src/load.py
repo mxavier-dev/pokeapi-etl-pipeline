@@ -77,58 +77,52 @@ def insert_all(data):
 
     conn = connect()
     cursor = conn.cursor()
-    print()
 
     try:
         values = [
             (int(row["id"]), row["name"], row["weight"], row["height"])
             for _, row in data.iterrows()
-            ]
+        ]
         cursor.executemany("""INSERT INTO pokemon (id, name, weight, height)
                            VALUES (%s,%s,%s,%s)
                            ON DUPLICATE KEY UPDATE
                            name = VALUES(name)""", values)
-        
-        all_types = set(t for types in data['types'] for t in types)
-        cursor.executemany("""INSERT IGNORE INTO types (name)
-                           VALUES (%s)
-                           """, [(t,) for t in all_types])
-        
-        all_abilities = set(a for ability in data['ability'] for a in ability)
 
+        all_types = set(t for types in data["types"] for t in types)
+        cursor.executemany("""INSERT IGNORE INTO types (name)
+                           VALUES (%s)""", [(t,) for t in all_types])
+
+        all_abilities = set(data["ability"].dropna().unique())
         cursor.executemany("""INSERT IGNORE INTO abilities (name)
-                           VALUES (%s)
-                           """, [(a,) for a in all_abilities])
+                           VALUES (%s)""", [(a,) for a in all_abilities])
 
         cursor.execute("SELECT id, name FROM types")
         type_map = {name: id for id, name in cursor.fetchall()}
 
-        df_exploded = data.explode("types")
+        cursor.execute("SELECT id, name FROM abilities")
+        ability_map = {name: id for id, name in cursor.fetchall()}
 
-        values = list(
-            zip(
-                df_exploded["id"].astype(int),
-                df_exploded["types"].map(type_map)
-            ))
-        cursor.executemany("""
-                           INSERT IGNORE INTO pokemon_types
-                           (pokemon_id, type_id)
-                           VALUES (%s, %s)
-                           """, values)
-        
-        df_exploded = data.explode("ability")
-
-        values = list(
-            zip(
-                df_exploded["id"].astype(int),
-                df_exploded["types"].map(type_map)
-            ))
+        df_types = data.explode("types")
+        values = [
+            (int(row["id"]), type_map[row["types"]])
+            for _, row in df_types.iterrows()
+        ]
         cursor.executemany("""
                            INSERT IGNORE INTO pokemon_types
                            (pokemon_id, type_id)
                            VALUES (%s, %s)
                            """, values)
 
+        ability_rows = [
+            (int(row["id"]), ability_map[row["ability"]])
+            for _, row in data.dropna(subset=["ability"]).iterrows()
+        ]
+        if ability_rows:
+            cursor.executemany("""
+                               INSERT IGNORE INTO pokemon_abilities
+                               (pokemon_id, ability_id)
+                               VALUES (%s, %s)
+                               """, ability_rows)
 
         conn.commit()
 
