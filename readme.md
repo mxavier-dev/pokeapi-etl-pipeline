@@ -89,7 +89,6 @@ Extract → Transform → Load
 * `pokemon_types`
 * `pokemon_abilities`
 
----
 
 ## 🔗 Relationships
 
@@ -97,6 +96,31 @@ Extract → Transform → Load
 pokemon 1---N pokemon_types N---1 types
 pokemon 1---N pokemon_abilities N---1 abilities
 ```
+---
+
+## 📊 Sample Output
+
+Example query result after pipeline execution:
+
+| pokemon    | type1   | type2   |
+|------------|--------|--------|
+| bulbasaur  | grass  | poison |
+| charmander | fire   | NULL   |
+| squirtle   | water  | NULL   |
+
+## 📸 Database Preview
+
+Example query result from MySQL:
+
+Command used:\
+SELECT p.name AS pokemon,\
+GROUP_CONCAT(t.name) AS types\
+FROM pokemon p\
+JOIN pokemon_types pt ON p.id = pt.pokemon_id\
+JOIN types t ON pt.type_id = t.id\
+GROUP BY p.id;\
+<img width="179" height="208" alt="image" src="https://github.com/user-attachments/assets/595692b5-6951-4164-80c1-3026eab091f8" />
+
 
 ---
 
@@ -120,8 +144,6 @@ cursor.executemany()
 
 Reduces database round-trips significantly.
 
----
-
 ### ✔ UPSERT Strategy
 
 ```sql
@@ -129,8 +151,6 @@ ON DUPLICATE KEY UPDATE
 ```
 
 Ensures idempotent data loading.
-
----
 
 ### ✔ Optimized ID Resolution
 
@@ -140,8 +160,6 @@ LAST_INSERT_ID(id)
 
 Avoids unnecessary SELECT queries.
 
----
-
 ### ✔ In-Memory Mapping (Cache)
 
 ```python
@@ -149,22 +167,6 @@ Avoids unnecessary SELECT queries.
 ```
 
 Avoids repeated lookups during relationship inserts.
-
----
-
-## ⚡ Performance Strategy
-
-Instead of:
-
-```text
-Row-by-row inserts (slow)
-```
-
-The pipeline uses:
-
-```text
-Batch inserts + caching + vectorized transformations
-```
 
 ---
 
@@ -177,8 +179,6 @@ git clone https://github.com/mxavier-dev/etl-pokeapi.git
 cd etl-pokeapi
 ```
 
----
-
 ### 2. Create virtual environment
 
 ```bash
@@ -187,15 +187,11 @@ source venv/bin/activate   # Linux/Mac
 venv\Scripts\activate      # Windows
 ```
 
----
-
 ### 3. Install dependencies
 
 ```bash
 pip install -r requirements.txt
 ```
-
----
 
 ### 4. Setup database
 
@@ -206,15 +202,28 @@ mysql -u root -p -e "CREATE DATABASE etl_pokeapi;"
 mysql -u root -p etl_pokeapi < db/schema.sql
 ```
 
----
-
 ### 5. Run pipeline
 
 ```bash
-python -m src.pipeline
+python src/pipeline.py
 ```
 > If you encounter a "python not found" error, make sure Python is installed and added to your system PATH.  
 > On some systems, you may need to use `python3` instead of `python`.
+
+---
+
+## ⏱️ Execution Time
+
+This pipeline processes real data from the PokéAPI and performs multiple transformations and database operations.
+
+- Expected runtime: **~3–5 minutes**
+- Depends on:
+  - API response time
+  - Network latency
+  - Database performance
+
+This is expected behavior for a full data load without parallelization or caching layers.
+
 ---
 
 ## 📂 Data Output
