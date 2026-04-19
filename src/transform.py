@@ -1,9 +1,6 @@
 import pandas as pd
 from extract import extract_data
 
-def concat_df(df1, df2):
-    return pd.concat([df1, df2], ignore_index=True)
-
 def transform_ability(data):
     data2 = data[0]['results']
     for i in range(1, len(data)):
